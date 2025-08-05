@@ -6,6 +6,12 @@ using TapSDK.CloudSave.Internal;
 
 namespace TapSDK.CloudSave.Mobile
 {
+    public class ErrorResponse
+    {
+        [JsonProperty("errorCode")] public int ErrorCode { get; set; }
+        [JsonProperty("errorMessage")] public string ErrorMessage { get; set; }
+    }
+
     public class TapCloudSaveBridge : ITapCloudSaveBridge
     {
         public static string TAP_CLOUDSAVE_SERVICE = "BridgeCloudSaveService";
@@ -17,6 +23,11 @@ namespace TapSDK.CloudSave.Mobile
         public TapCloudSaveBridge()
         {
             EngineBridge.GetInstance().Register(TDS_CLOUDSAVE_SERVICE_CLZ, TDS_CLOUDSAVE_SERVICE_IMPL);
+        }
+
+        public void Init(TapTapSdkOptions options)
+        {
+            // 原生由原生内部实现
         }
 
         public void RegisterCloudSaveCallback(ITapCloudSaveCallback callback)
@@ -37,7 +48,7 @@ namespace TapSDK.CloudSave.Mobile
                         callback.OnResult(-1);
                         return;
                     }
-                    
+
                     var result = JsonConvert.DeserializeObject<TapEngineBridgeResult>(response.content);
                     if (result != null && result.code == TapEngineBridgeResult.RESULT_SUCCESS)
                     {
@@ -63,12 +74,12 @@ namespace TapSDK.CloudSave.Mobile
             });
         }
 
-        public void CreateArchive(string metadata, string archiveFilePath, string archiveCoverPath, ITapCloudSaveRequestCallback callback)
+        public void CreateArchive(ArchiveMetadata metadata, string archiveFilePath, string archiveCoverPath, ITapCloudSaveRequestCallback callback)
         {
             EngineBridge.GetInstance().CallHandler(new Command.Builder()
                 .Service(TAP_CLOUDSAVE_SERVICE)
                 .Method("createArchive")
-                .Args("archiveMetadata",  metadata)
+                .Args("archiveMetadata",  JsonConvert.SerializeObject(metadata))
                 .Args("archiveFilePath",  archiveFilePath)
                 .Args("archiveCoverPath",  archiveCoverPath)
                 .Callback(true)
@@ -100,7 +111,22 @@ namespace TapSDK.CloudSave.Mobile
                     }
                     else
                     {
-                        callback.OnRequestError(-1, "Failed to create archive: content="+response.content);
+                        try
+                        {
+                            var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(result.content);
+                            if (errorResponse != null)
+                            {
+                                callback.OnRequestError(errorResponse.ErrorCode, errorResponse.ErrorMessage);
+                            }
+                            else
+                            {
+                                callback.OnRequestError(-1, "Failed to create archive: content="+response.content);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            callback.OnRequestError(-1, "Failed to create archive: content="+response.content);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -110,15 +136,15 @@ namespace TapSDK.CloudSave.Mobile
             });
         }
         
-        public void UpdateArchive(string archiveUuid, string metadata, string archiveFilePath, string archiveCoverPath, ITapCloudSaveRequestCallback callback)
+        public void UpdateArchive(string archiveUuid, ArchiveMetadata metadata, string archiveFilePath, string archiveCoverPath, ITapCloudSaveRequestCallback callback)
         {
             EngineBridge.GetInstance().CallHandler(new Command.Builder()
                 .Service(TAP_CLOUDSAVE_SERVICE)
                 .Method("updateArchive")
-                .Args("archiveUUID",  archiveUuid)
-                .Args("archiveMetadata",  metadata)
-                .Args("archiveFilePath",  archiveFilePath)
-                .Args("archiveCoverPath",  archiveCoverPath)
+                .Args("archiveUUIDForUpdate",  archiveUuid)
+                .Args("archiveMetadataForUpdate",  JsonConvert.SerializeObject(metadata))
+                .Args("archiveFilePathForUpdate",  archiveFilePath)
+                .Args("archiveCoverPathForUpdate",  archiveCoverPath)
                 .Callback(true)
                 .OnceTime(true)
                 .CommandBuilder(), (response) =>
@@ -148,7 +174,22 @@ namespace TapSDK.CloudSave.Mobile
                     }
                     else
                     {
-                        callback.OnRequestError(-1, "Failed to update archive: content="+response.content);
+                        try
+                        {
+                            var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(result.content);
+                            if (errorResponse != null)
+                            {
+                                callback.OnRequestError(errorResponse.ErrorCode, errorResponse.ErrorMessage);
+                            }
+                            else
+                            {
+                                callback.OnRequestError(-1, "Failed to update archive: content="+response.content);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            callback.OnRequestError(-1, "Failed to update archive: content="+response.content);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -193,7 +234,22 @@ namespace TapSDK.CloudSave.Mobile
                     }
                     else
                     {
-                        callback.OnRequestError(-1, "Failed to delete archive: content="+response.content);
+                        try
+                        {
+                            var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(result.content);
+                            if (errorResponse != null)
+                            {
+                                callback.OnRequestError(errorResponse.ErrorCode, errorResponse.ErrorMessage);
+                            }
+                            else
+                            {
+                                callback.OnRequestError(-1, "Failed to delete archive: content="+response.content);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            callback.OnRequestError(-1, "Failed to delete archive: content="+response.content);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -237,7 +293,22 @@ namespace TapSDK.CloudSave.Mobile
                     }
                     else
                     {
-                        callback.OnRequestError(-1, "Failed to get archive list: content="+response.content);
+                        try
+                        {
+                            var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(result.content);
+                            if (errorResponse != null)
+                            {
+                                callback.OnRequestError(errorResponse.ErrorCode, errorResponse.ErrorMessage);
+                            }
+                            else
+                            {
+                                callback.OnRequestError(-1, "Failed to get archive list: content="+response.content);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            callback.OnRequestError(-1, "Failed to get archive list: content="+response.content);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -283,7 +354,22 @@ namespace TapSDK.CloudSave.Mobile
                     }
                     else
                     {
-                        callback.OnRequestError(-1, "Failed to convert base64 data: content="+response.content);
+                        try
+                        {
+                            var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(result.content);
+                            if (errorResponse != null)
+                            {
+                                callback.OnRequestError(errorResponse.ErrorCode, errorResponse.ErrorMessage);
+                            }
+                            else
+                            {
+                                callback.OnRequestError(-1, "Failed to get archive data: content="+response.content);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            callback.OnRequestError(-1, "Failed to get archive data: content="+response.content);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -298,8 +384,8 @@ namespace TapSDK.CloudSave.Mobile
             EngineBridge.GetInstance().CallHandler(new Command.Builder()
                 .Service(TAP_CLOUDSAVE_SERVICE)
                 .Method("getArchiveCover")
-                .Args("archiveUUID",  archiveUuid)
-                .Args("archiveFileID",  archiveFileId)
+                .Args("archiveUUIDForCover",  archiveUuid)
+                .Args("archiveFileIDForCover",  archiveFileId)
                 .Callback(true)
                 .OnceTime(true)
                 .CommandBuilder(), (response) =>
@@ -329,7 +415,22 @@ namespace TapSDK.CloudSave.Mobile
                     }
                     else
                     {
-                        callback.OnRequestError(-1, "Failed to convert base64 data: content="+response.content);
+                        try
+                        {
+                            var errorResponse = JsonConvert.DeserializeObject<ErrorResponse>(result.content);
+                            if (errorResponse != null)
+                            {
+                                callback.OnRequestError(errorResponse.ErrorCode, errorResponse.ErrorMessage);
+                            }
+                            else
+                            {
+                                callback.OnRequestError(-1, "Failed to get archive cover: content="+response.content);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            callback.OnRequestError(-1, "Failed to get archive cover: content="+response.content);
+                        }
                     }
                 }
                 catch (Exception e)

@@ -9,10 +9,12 @@ namespace TapSDK.CloudSave.Internal.Init
 
         public void Init(TapTapSdkOptions coreOption)
         {
+            TapTapCloudSaveInternal.Init(coreOption);
         }
 
         public void Init(TapTapSdkOptions coreOption, TapTapSdkBaseOptions[] otherOptions)
         {
+            TapTapCloudSaveInternal.Init(coreOption);
         }
     }
 }

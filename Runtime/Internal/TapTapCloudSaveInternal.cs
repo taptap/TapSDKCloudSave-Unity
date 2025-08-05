@@ -1,3 +1,4 @@
+using TapSDK.Core;
 using TapSDK.Core.Internal.Utils;
 
 namespace TapSDK.CloudSave.Internal
@@ -11,19 +12,24 @@ namespace TapSDK.CloudSave.Internal
             Bridge = BridgeUtils.CreateBridgeImplementation(typeof(ITapCloudSaveBridge), "TapSDK.CloudSave")
                 as ITapCloudSaveBridge;
         }
-        
+
+        internal static void Init(TapTapSdkOptions options)
+        {
+            Bridge?.Init(options);
+        }
+
         internal static void RegisterCloudSaveCallback(ITapCloudSaveCallback callback)
         {
             Bridge?.RegisterCloudSaveCallback(callback);
         }
 
-        internal static void CreateArchive(string metadata, string archiveFilePath, string archiveCoverPath,
+        internal static void CreateArchive(ArchiveMetadata metadata, string archiveFilePath, string archiveCoverPath,
             ITapCloudSaveRequestCallback callback)
         {
             Bridge?.CreateArchive(metadata, archiveFilePath, archiveCoverPath, callback);
         }
 
-        internal static void UpdateArchive(string archiveUuid, string metadata, string archiveFilePath,
+        internal static void UpdateArchive(string archiveUuid, ArchiveMetadata metadata, string archiveFilePath,
             string archiveCoverPath, ITapCloudSaveRequestCallback callback)
         {
             Bridge?.UpdateArchive(archiveUuid, metadata, archiveFilePath, archiveCoverPath, callback);

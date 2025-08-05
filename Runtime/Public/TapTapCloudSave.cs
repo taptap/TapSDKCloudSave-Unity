@@ -4,18 +4,20 @@ namespace TapSDK.CloudSave
 {
     public class TapTapCloudSave
     {
+        public static readonly string Version = "4.8.1-beta.1";
+
         public static void RegisterCloudSaveCallback(ITapCloudSaveCallback callback)
         {
             TapTapCloudSaveInternal.RegisterCloudSaveCallback(callback);
         }
 
-        public static void CreateArchive(string metadata, string archiveFilePath, string archiveCoverPath,
+        public static void CreateArchive(ArchiveMetadata metadata, string archiveFilePath, string archiveCoverPath,
             ITapCloudSaveRequestCallback callback)
         {
             TapTapCloudSaveInternal.CreateArchive(metadata, archiveFilePath, archiveCoverPath, callback);
         }
 
-        public static void UpdateArchive(string archiveUuid, string metadata, string archiveFilePath,
+        public static void UpdateArchive(string archiveUuid, ArchiveMetadata metadata, string archiveFilePath,
             string archiveCoverPath, ITapCloudSaveRequestCallback callback)
         {
             TapTapCloudSaveInternal.UpdateArchive(archiveUuid, metadata, archiveFilePath, archiveCoverPath, callback);
